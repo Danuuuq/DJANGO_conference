@@ -1,8 +1,21 @@
+import datetime as dt 
+
 from django.db import models
+from django.db.models import Q, F
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
+
+
+class BookingQuerySet(models.QuerySet):
+    def with_related_data(self):
+        return self.select_related('acs_phones')
+
+
+class AcsQuerySet(models.QuerySet):
+    def with_related_data(self):
+        return self.select_related('bookings')
 
 
 class AcsPhone(models.Model):
@@ -19,6 +32,8 @@ class AcsPhone(models.Model):
                                        MaxValueValidator(9999)],
                                    help_text='ПИН-код от номера на АКСС')
 
+    objects = AcsQuerySet.as_manager()
+
     class Meta:
         verbose_name = 'АКС Номер'
         verbose_name_plural = 'АКС Номера'
@@ -31,7 +46,7 @@ class AcsPhone(models.Model):
         ]
 
     def __str__(self):
-        return self.phone
+        return f'{self.phone}'
 
 
 class BookingAcs(models.Model):
@@ -42,17 +57,26 @@ class BookingAcs(models.Model):
     owner = models.ForeignKey(User, verbose_name='Владелец бронирования',
                               on_delete=models.CASCADE)
 
+    objects = BookingQuerySet.as_manager()
+
     class Meta:
         default_related_name = 'bookings'
+        verbose_name = 'Бронь АКС номера'
+        verbose_name_plural = 'Бронирования АКС номеров'
+        ordering = ('start_conf', 'end_conf', 'acs_phone')
         constraints = [
             models.CheckConstraint(
-                condition=models.Q(start_conf__lt=models.F('end_conf')),
-                name='Начало до окончания'
+                condition=Q(start_conf__lt=F('end_conf')),
+                name='Время начало бронирования после времени окончания'
             ),
-            # models.CheckConstraint(
-            #     condition=models.Q(start_conf__lt=models.F('end_conf')),
-            #     name='Начало до окончания'
-            # )
+            models.CheckConstraint(
+                condition=Q(start_conf__gt=dt.datetime.now()),
+                name='Время начала бронирование в прошлом'
+            ),
+            models.CheckConstraint(
+                condition=Q(start_conf__date=F('end_conf__date')),
+                name='Бронирование заканчивается в следующий день'
+            ),
         ]
 
     def __str__(self):
