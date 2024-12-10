@@ -2,6 +2,7 @@ import datetime as dt
 
 from django.db import models
 from django.db.models import Q, F
+from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.contrib.auth import get_user_model
 
@@ -10,12 +11,12 @@ User = get_user_model()
 
 class BookingQuerySet(models.QuerySet):
     def with_related_data(self):
-        return self.select_related('acs_phones')
+        return self.select_related('acs_phone', 'owner')
 
 
 class AcsQuerySet(models.QuerySet):
     def with_related_data(self):
-        return self.select_related('bookings')
+        return self.prefetch_related('bookings')
 
 
 class AcsPhone(models.Model):
@@ -79,5 +80,18 @@ class BookingAcs(models.Model):
             ),
         ]
 
+    def clean(self):
+        """Проверка на пересечение с другими бронированиями."""
+        if self.start_conf and self.end_conf:
+            overlapping_bookings = BookingAcs.objects.filter(
+                acs_phone=self.acs_phone,
+                start_conf__lt=self.end_conf,
+                end_conf__gt=self.start_conf
+            ).exclude(id=self.id)
+
+            if overlapping_bookings.exists():
+                raise ValidationError(
+                    'Бронирование пересекается с уже существующими.')
+
     def __str__(self):
-        return f'Бронь {self.owner} номера {self.acs_phone}'
+        return f'Бронь {self.owner} номера {self.acs_phone} id {self.id}'
