@@ -1,0 +1,98 @@
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Календарь бронирований</title>
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/fullcalendar.min.css' %}" rel="stylesheet">
+    <script src="{% static 'js/fullcalendar.min.js' %}"></script> 
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="mb-4">Календарь бронирований номеров</h1>
+
+        <div id="calendar"></div>
+
+        <!-- Кнопка для возврата к месяцу (по умолчанию скрыта) -->
+        <button id="backToMonth" class="btn btn-secondary mt-3" style="display:none;">Назад к месяцу</button>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var calendarEl = document.getElementById('calendar');
+            var backToMonthBtn = document.getElementById('backToMonth');
+
+            // Инициализация календаря FullCalendar
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth', // Вид по умолчанию (месяц)
+                locale: 'ru', // Локализация
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,dayGridDay' // Добавляем недельный вид
+                },
+                views: {
+                    dayGridMonth: {
+                        // Настройка отображения времени для событий в месячном виде
+                        eventTimeFormat: {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            hour12: false // 24-часовой формат
+                        }
+                    },
+                    timeGridWeek: { // Вид по часам для недели
+                        slotLabelFormat: {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            hour12: false
+                        },
+                        eventTimeFormat: {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            hour12: false
+                        }
+                    },
+                    dayGridDay: {
+                        slotLabelFormat: { // Изменение формата времени
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            hour12: false // 24-часовой формат
+                        },
+                        // Настройка отображения времени событий
+                        eventTimeFormat: {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            hour12: false // 24-часовой формат для событий
+                        },
+                    }
+                },
+                selectable: true,
+                events: {{ events|safe }}, // Передаем события из Django
+                dateClick: function(info) {
+                    // Переключение на вид дня при клике по дате
+                    calendar.changeView('dayGridDay', info.dateStr);
+                    // Показать кнопку возврата к месяцу
+                    backToMonthBtn.style.display = 'block';
+                },
+
+                // Обработка выбора времени (работает в виде недели)
+                select: function(info) {
+                    // Переключение на дневной вид для выбранной даты
+                    calendar.changeView('dayGridDay', info.startStr);
+                }
+            });
+
+            calendar.render();
+
+            // Логика для кнопки возврата к месячному виду
+            backToMonthBtn.addEventListener('click', function() {
+                calendar.changeView('dayGridMonth');
+                // Скрыть кнопку, когда пользователь вернется в месячный вид
+                backToMonthBtn.style.display = 'none';
+            });
+        });
+    </script>
+    <script src="{% static 'js/popper.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+</body>
+</html>

@@ -17,6 +17,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "django_bootstrap5",
     "audioconf.apps.AudioconfConfig",
+    "core.apps.CoreConfig",
 ]
 
 MIDDLEWARE = [
