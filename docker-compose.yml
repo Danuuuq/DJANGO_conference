@@ -13,8 +13,8 @@ services:
     build: ./portal_conf/
     env_file: .env
     volumes:
-      - static:/app/staticfiles
-      - media:/app/media
+      - static:/static
+      - media:/media
     depends_on:
       - db
   gateway:
@@ -23,7 +23,7 @@ services:
     ports:
       - 8000:80
     volumes:
-      - static:/app/staticfiles
-      - media:/app/media
+      - static:/static
+      - media:/media
     depends_on:
       - backend

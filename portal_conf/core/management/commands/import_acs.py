@@ -3,7 +3,7 @@ import csv
 from django.conf import settings
 from django.core.management.base import BaseCommand
 
-from audioconf.models import AcsPhone
+from audioconf.models import AcsPhone, Department
 
 
 class Command(BaseCommand):
@@ -20,7 +20,8 @@ class Command(BaseCommand):
         with open(file_path, encoding='utf-8') as file:
             reader = csv.reader(file, delimiter=';')
             data = [model(acs_id=row[0], phone=row[1],
-                          password=row[2], department=row[3])
+                          password=row[2],
+                          department=Department.objects.get(id=row[3]))
                     for row in reader]
             model.objects.bulk_create(data)
         self.stdout.write(self.style.SUCCESS('Успешная загрузка '
