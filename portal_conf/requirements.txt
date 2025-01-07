@@ -2,6 +2,10 @@ asgiref==3.8.1
 Django==5.1.4
 django-bootstrap5==24.3
 django-widget-tweaks==1.5.0
+psycopg2-binary==2.9.3
+PyYAML==6.0.2
+pillow==11.0.0
 sqlparse==0.5.2
 tzdata==2024.2
 ldap3==2.9.1
+webcolors==24.11.1

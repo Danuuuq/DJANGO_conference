@@ -1,10 +1,11 @@
+import os
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = "django-insecure-1%0ijebvwpuf#8(lq5govyr10+&st2zgo904csyj7r64$btd_2"
+SECRET_KEY = os.getenv('SECRET_KEY', "django-insecure-1%0ijebvwpuf#8(lq5govyr10+&st2zgo904csyj7r64$btd_2")
 
-DEBUG = True
+DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
 ALLOWED_HOSTS = ['*']
 
@@ -46,8 +47,6 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
-                
-                'audioconf.context_processors.booking_form',
             ],
         },
     },
@@ -55,13 +54,24 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "portal_conf.wsgi.application"
 
-
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('POSTGRES_DB', 'django'),
+        'USER': os.getenv('POSTGRES_USER', 'django'),
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD', ''),
+        'HOST': os.getenv('DB_HOST', ''),
+        'PORT': os.getenv('DB_PORT', 5432)
     }
 }
+
+# Только для разработки
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.sqlite3",
+#         "NAME": BASE_DIR / "db.sqlite3",
+#     }
+# }
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -88,10 +98,10 @@ USE_I18N = True
 USE_TZ = True
 
 
-STATIC_URL = "static/"
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'collected_static'
 
-STATICFILES_DIRS = [BASE_DIR / 'static', ]
-
-MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_URL = '/media/'
+MEDIA_ROOT = '/media'
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
