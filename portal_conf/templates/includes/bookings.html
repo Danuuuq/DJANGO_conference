@@ -1,0 +1,20 @@
+{% for booking in bookings %}
+  <div class="media mb-4">
+    <div class="media-body">
+      <h5 class="mt-0">
+        Ответственный: {{ booking.responsible }}
+      </h5>
+      <h7>
+       Время бронирования {{ booking.start_conf|date:"d E, H:i" }} - {{ booking.end_conf|date:"H:i" }} <br>
+      </h7>
+      {% if user == booking.owner %}
+        <a class="btn btn-sm text-muted" href="{% url 'audioconf:phones_list' %}" role="button">
+          Отредактировать (в разработке)
+        </a>
+        <a class="btn btn-sm text-muted" href="{% url 'audioconf:phones_list' %}" role="button">
+          Удалить (в разработке)
+        </a>
+      {% endif %}
+    </div>
+  </div>
+{% endfor %}

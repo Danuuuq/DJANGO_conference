@@ -3,24 +3,24 @@ import csv
 from django.conf import settings
 from django.core.management.base import BaseCommand
 
-from audioconf.models import AcsPhone
+from audioconf.models import Department
 
 
 class Command(BaseCommand):
-    help = 'Import data from CSV files into the database'
+    help = 'Импорт данных из CSV-файлов в базу данных'
 
     def handle(self, *args, **kwargs):
 
         data_dir = settings.BASE_DIR / 'data'
 
-        self.import_data(data_dir / 'acs_phone.csv',
-                         AcsPhone)
+        self.import_data(data_dir / 'department.csv',
+                         Department)
 
     def import_data(self, file_path, model):
         with open(file_path, encoding='utf-8') as file:
             reader = csv.reader(file, delimiter=';')
-            data = [model(acs_id=row[0], phone=row[1], password=row[2])
+            data = [model(id=row[0], name=row[1])
                     for row in reader]
             model.objects.bulk_create(data)
-        self.stdout.write(self.style.SUCCESS('Successfully loaded'
-                                             f'data from {file_path}'))
+        self.stdout.write(self.style.SUCCESS('Успешная загрузка '
+                                             f'данных из {file_path}'))

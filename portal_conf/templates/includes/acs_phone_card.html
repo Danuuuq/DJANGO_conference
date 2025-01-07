@@ -1,0 +1,32 @@
+<div class="col d-flex justify-content-center">
+  <div class="card" style="width: 40rem;">
+    <div class="card-body">
+      <h5 class="card-title">{{ acs_phone.phone }}</h5>
+      <h6 class="card-subtitle mb-2 text-muted">
+        <small>
+          Подразделение: {{ acs_phone.department }}<br>
+          Текст для отправки:<br>
+        </small>
+      </h6>
+      <p class="card-text">
+        Номер для совещания<br>
+        Газпром инвест {{ acs_phone.phone }}<br>
+        Газпром и ДО   (785) {{ acs_phone.phone }}<br>
+        Прочие  (812) 613-30-{{ acs_phone.phone|slice:"-2" }}<br>
+        Пин-код {{ acs_phone.password }}
+      </p>
+      <button class="btn btn-primary" onclick="copyText()">Скопировать текст</button>
+      <script>
+        function copyText() {
+        var text = `Номер для совещания\nГазпром инвест {{ acs_phone.phone }}\nГазпром и ДО   (785) {{ acs_phone.phone }}\nПрочие  (812) 613-30-{{ acs_phone.phone|slice:"-2" }}\nПин-код {{ acs_phone.password }}`;
+        navigator.clipboard.writeText(text).then(function() {
+          alert('Текст скопирован!');
+        }, function(err) {
+          alert('Ошибка при копировании текста: ', err);
+        });
+        }
+      </script>
+      <a href="{% url 'audioconf:phone_detail' acs_phone.id %}" class="btn btn-primary">Страница номера и его бронирований</a>
+    </div>
+  </div>
+</div>

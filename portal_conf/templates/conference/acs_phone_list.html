@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}
+  Номера конференций
+{% endblock %}
+{% block content %}
+  {% for acs_phone in page_obj %}
+    <article class="mb-5">
+      {% include "includes/acs_phone_card.html" %}
+    </article>
+  {% endfor %}
+  {% include "includes/paginator.html" %}
+{% endblock %}

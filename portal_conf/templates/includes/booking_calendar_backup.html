@@ -52,17 +52,107 @@
     <script src="{% static 'js/fullcalendar.min.js' %}"></script> 
 </head>
 <body>
-   
     
     <!-- Кнопка для открытия модального окна -->
     <button id="openBookingModal" class="btn btn-primary">Создать бронирование</button>
-    {% include "modals/booking_form.html" %}
-    {% include "ajax/booking_ajax.html" %}
+    
+    <!-- Модальное окно для ввода данных бронирования -->
+    <div id="bookingModal" class="modal" tabindex="-1" role="dialog">
+        <div class="modal-content">
+            <h4>Создать бронирование</h4>
+            <form id="bookingForm">
+                <label for="acs_phone">Номер конференции</label>
+                <select id="acs_phone" name="acs_phone" required>
+                    {% for phone in acs_phones %}
+                        <option value="{{ phone.id }}">{{ phone.phone }}</option>
+                    {% endfor %}
+                </select>
+    
+                <label for="start_conf">Время начала</label>
+                <input type="datetime-local" id="start_conf" name="start_conf" required>
+    
+                <label for="end_conf">Время окончания</label>
+                <input type="datetime-local" id="end_conf" name="end_conf" required>
+    
+                <label for="responsible">ФИО ответственного за номер</label>
+                <input type="text" id="responsible" name="responsible" required>
+    
+                <button type="submit" class="btn">Создать</button>
+                <button type="button" class="btn close-modal">Отмена</button>
+            </form>
+        </div>
+    </div>
+    <script>
+        // Открытие и закрытие модального окна
+        document.getElementById('openBookingModal').addEventListener('click', function() {
+            document.getElementById('bookingModal').style.display = 'block';  // Открываем модальное окно
+        });
+        
+        document.querySelector('.close-modal').addEventListener('click', function() {
+            document.getElementById('bookingModal').style.display = 'none';  // Закрываем модальное окно
+        });
+        
+        // Обработчик отправки формы бронирования
+        document.getElementById('bookingForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Отключаем стандартное поведение формы
+        
+            // Собираем данные из формы
+            var acsPhone = document.getElementById('acs_phone').value;
+            var startConf = document.getElementById('start_conf').value;
+            var endConf = document.getElementById('end_conf').value;
+            var responsible = document.getElementById('responsible').value;
+        
+            // Отправляем данные через AJAX
+            $.ajax({
+                url: '/create/',
+                type: 'POST',
+                data: {
+                    acs_phone: $('#acs_phone').val(),  // ID выбранного номера
+                    start_conf: $('#start_conf').val(),
+                    end_conf: $('#end_conf').val(),
+                    responsible: $('#responsible').val(),
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+                },
+                success: function(response) {
+                    alert('Бронирование успешно создано!');
+                    // Создание текста для копирования в буфер обмена
+                    var acsPhone = response.acs_phone;
+                    var pinCode = response.pin_code;
+                    var bookingInfo = `Номер для совещания:
+                                       Газпром инвест: ${acsPhone}
+                                       Газпром и ДО: (785) ${acsPhone}
+                                       Городской номер: 8(812)613-30-${acsPhone.slice(-2)}
+                                       Пин-код: ${pinCode}`.replace(/^\s+/gm, '');
 
+                    // Копирование текста в буфер обмена
+                    navigator.clipboard.writeText(bookingInfo).then(function() {
+                        alert('Данные бронирования скопированы в буфер обмена!');
+                    }).catch(function(err) {
+                        alert('Не удалось скопировать данные в буфер обмена: ' + err);
+                    });
+            
+                    calendar.refetchEvents();  // Обновляем события на календаре
+                    $('#bookingModal').modal('hide');
+                    $('#error-message').hide();
+
+                    // document.getElementById('bookingModal').style.display = 'none';  // Закрываем модальное окно
+                },
+                error: function(xhr, status, error) {
+                    $('#error-message').text(xhr.responseText).show(); // Показываем сообщение об ошибке
+                    // alert('Ошибка при создании бронирования: ' + error);
+                }
+            });
+        });
+        </script>
+
+
+
+    
     
     <!-- Подключаем jQuery и Bootstrap 5 JavaScript -->
     <script src="{% static 'js/jquery-3.6.0.min.js' %}"></script>
     <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+    
 
     <div class="container mt-5">
         <h1 class="mb-4">Календарь бронирований номеров</h1>
@@ -73,7 +163,6 @@
         <button id="backToMonth" class="btn btn-secondary mt-3" style="display:none;">Назад к месяцу</button>
     </div>
     <script>
-        var calendar; // Объект календаря
         document.addEventListener('DOMContentLoaded', function() {
             var calendarEl = document.getElementById('calendar');
             var backToMonthBtn = document.getElementById('backToMonth');
@@ -150,7 +239,6 @@
         });
     </script>
     <script src="{% static 'js/popper.min.js' %}"></script>
-    <script src="{% static 'js/jquery-3.6.0.min.js' %}"></script>
     <script src="{% static 'js/bootstrap.min.js' %}"></script>
 </body>
 </html>

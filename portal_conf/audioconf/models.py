@@ -16,7 +16,44 @@ class BookingQuerySet(models.QuerySet):
 
 class AcsQuerySet(models.QuerySet):
     def with_related_data(self):
-        return self.prefetch_related('bookings')
+        return self.prefetch_related('bookings', 'department',
+                                     'department__employees')
+
+
+class Department(models.Model):
+    name = models.CharField('Название подразделения',
+                            max_length=100, unique=True)
+    is_superdepartment = models.BooleanField('Суперподразделение',
+                                             default=False)
+
+    class Meta:
+        verbose_name = 'Подразделение'
+        verbose_name_plural = 'Подразделения'
+        default_related_name = 'departments'
+        ordering = ('id', 'name',)
+
+    def __str__(self):
+        return f'{self.name}'
+
+
+class Employees(models.Model):
+    first_name = models.CharField('Имя', max_length=50)
+    last_name = models.CharField('Фамилия', max_length=50)
+    middle_name = models.CharField('Отчество', max_length=50, blank=True)
+    email = models.EmailField('Email', unique=True)
+    department = models.ForeignKey(Department, on_delete=models.SET_NULL,
+                                   default=None, null=True, blank=True)
+
+    class Meta:
+        verbose_name = 'Сотрудник'
+        verbose_name_plural = 'Сотрудники'
+        default_related_name = 'employees'
+        ordering = ('last_name', 'first_name', 'middle_name',)
+
+    def __str__(self):
+        name = (self.last_name + ' ' + self.first_name[0]
+                + '.' + self.middle_name[0] + '.')
+        return f'{name}'
 
 
 class AcsPhone(models.Model):
@@ -32,6 +69,8 @@ class AcsPhone(models.Model):
                                        MinValueValidator(0000),
                                        MaxValueValidator(9999)],
                                    help_text='ПИН-код от номера на АКСС')
+    department = models.ForeignKey(Department, on_delete=models.SET_NULL,
+                                   default=1, null=True, blank=True)
 
     objects = AcsQuerySet.as_manager()
 
@@ -39,6 +78,7 @@ class AcsPhone(models.Model):
         verbose_name = 'АКС Номер'
         verbose_name_plural = 'АКС Номера'
         default_related_name = 'acs_phones'
+        ordering = ('phone', 'acs_id',)
         constraints = [
             models.UniqueConstraint(
                 fields=('acs_id', 'phone'),
@@ -55,6 +95,8 @@ class BookingAcs(models.Model):
                                   verbose_name='АКС Номер')
     start_conf = models.DateTimeField('Время начала конференции')
     end_conf = models.DateTimeField('Время окончания конференции')
+    responsible = models.TextField('Ответственный за бронирование',
+                                   max_length=50, null=True, blank=True)
     owner = models.ForeignKey(User, verbose_name='Владелец бронирования',
                               on_delete=models.CASCADE)
 
@@ -70,10 +112,11 @@ class BookingAcs(models.Model):
                 condition=Q(start_conf__lt=F('end_conf')),
                 name='Время начало бронирования после времени окончания'
             ),
-            models.CheckConstraint(
-                condition=Q(start_conf__gt=dt.datetime.now()),
-                name='Время начала бронирование в прошлом'
-            ),
+            # При миграции выдает ошибку, так как существуют записи в прошлом
+            # models.CheckConstraint(
+            #     condition=Q(start_conf__gt=dt.datetime.now()),
+            #     name='Время начала бронирование в прошлом'
+            # ),
             models.CheckConstraint(
                 condition=Q(start_conf__date=F('end_conf__date')),
                 name='Бронирование заканчивается в следующий день'

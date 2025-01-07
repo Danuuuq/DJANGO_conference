@@ -4,9 +4,20 @@
     <div class="container">
       <a class="navbar-brand" href="{% url 'audioconf:index' %}">
         <img src="{% static 'img/logo.png' %}" width="30" height="30" class="d-inline-block align-top" alt="">
-        Конференции
+        Портал конференций
       </a>
       {% with request.resolver_match.view_name as view_name %}
+        <ul class="nav  nav-pills">
+          <li class="nav-item">
+            <a class="nav-link {% if view_name == 'audioconf:phones_list' %} text-white {% endif %}" href="{% url 'audioconf:phones_list' %}">
+              Номера конференции
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link {% if view_name == 'audioconf:index' %} text-white {% endif %}" href="{% url 'audioconf:index' %}">
+              Календарь бронирования конференций
+            </a>
+          </li>
           {% if user.is_authenticated %}
             <div class="btn-group" role="group" aria-label="Basic outlined example">
               <button type="button" class="btn btn-outline-primary"><a class="text-decoration-none text-reset"

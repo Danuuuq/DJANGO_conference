@@ -1,0 +1,76 @@
+
+<script>
+    // Открытие и закрытие модального окна
+    document.getElementById('openBookingModal').addEventListener('click', function() {
+        document.getElementById('bookingModal').style.display = 'block';  // Открываем модальное окно
+    });
+    
+    document.querySelector('.close-modal').addEventListener('click', function() {
+        document.getElementById('bookingModal').style.display = 'none';  // Закрываем модальное окно
+    });
+    
+    // Обработчик отправки формы бронирования
+    document.getElementById('bookingForm').addEventListener('submit', function(event) {
+        event.preventDefault(); // Отключаем стандартное поведение формы
+    
+        // Собираем данные из формы
+        var acsPhone = document.getElementById('acs_phone').value;
+        var startConf = document.getElementById('start_conf').value;
+        var endConf = document.getElementById('end_conf').value;
+        var responsible = document.getElementById('responsible').value;
+    
+        // Отправляем данные через AJAX
+        $.ajax({
+            url: '/create/',
+            type: 'POST',
+            data: {
+                acs_phone: $('#acs_phone').val(),  // ID выбранного номера
+                start_conf: $('#start_conf').val(),
+                end_conf: $('#end_conf').val(),
+                responsible: $('#responsible').val(),
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+            },
+            success: function(response) {
+                alert('Бронирование успешно создано!');
+                // Создание текста для копирования в буфер обмена
+                var acsPhone = response.acs_phone;
+                var pinCode = response.pin_code;
+                var bookingInfo = `Номер для совещания:
+                                   Газпром инвест: ${acsPhone}
+                                   Газпром и ДО: (785) ${acsPhone}
+                                   Городской номер: 8(812)613-30-${acsPhone.slice(-2)}
+                                   Пин-код: ${pinCode}`.replace(/^\s+/gm, '');
+
+                // Копирование текста в буфер обмена
+                navigator.clipboard.writeText(bookingInfo).then(function() {
+                    alert('Данные бронирования скопированы в буфер обмена!');
+                }).catch(function(err) {
+                    alert('Не удалось скопировать данные в буфер обмена: ' + err);
+                });
+        
+                // Обновление событий на календаре Не работает надо разобраться с глобальной переменной calendar
+                // calendar.render();
+
+                // Закрытие модального окна с использованием Bootstrap метода
+                //$('#bookingModal').modal('hide');
+                document.getElementById('bookingModal').style.display = 'none';  // Закрываем модальное окно
+                },
+            error: function(xhr, status, response) {
+                if (xhr.status == 400) {
+                    var errors = xhr.responseJSON.error;
+                    var errorMessage = '';
+                    
+                    // Перебираем все ошибки и добавляем их к сообщению
+                    $.each(errors, function(field, messages) {
+                        errorMessage += messages.join(', ');
+                    });
+            
+                    // Отображаем ошибки в модальном окне или на странице
+                    alert(errorMessage);
+                } else {
+                    alert('Ошибка при создании бронирования: ' + response.error);
+                }
+            }
+        });
+    });
+</script>

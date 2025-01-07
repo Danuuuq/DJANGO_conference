@@ -18,6 +18,7 @@ INSTALLED_APPS = [
     "django_bootstrap5",
     "audioconf.apps.AudioconfConfig",
     "core.apps.CoreConfig",
+    "widget_tweaks",
 ]
 
 MIDDLEWARE = [
@@ -45,6 +46,8 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                
+                'audioconf.context_processors.booking_form',
             ],
         },
     },

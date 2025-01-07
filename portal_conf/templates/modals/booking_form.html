@@ -1,0 +1,23 @@
+<!-- Модальное окно для ввода данных бронирования -->
+{% load widget_tweaks %}
+<div id="bookingModal" class="modal" tabindex="-1" role="dialog">
+    <div class="modal-content">
+        <h4>Создать бронирование</h4>
+        <form id="bookingForm">
+            <label for="acs_phone">Номер конференции</label>
+            <select id="acs_phone" name="acs_phone" required>
+                {% for phone in acs_phones %}
+                    <option value="{{ phone.id }}">{{ phone.phone }}</option>
+                {% endfor %}
+            </select>
+            <label for="start_conf">Время начала</label>
+            <input type="datetime-local" id="start_conf" name="start_conf" required>
+            <label for="end_conf">Время окончания</label>
+            <input type="datetime-local" id="end_conf" name="end_conf" required>
+            <label for="responsible">ФИО ответственного за номер</label>
+            <input type="text" id="responsible" name="responsible" required>
+            <button type="submit" class="btn">Создать</button>
+            <button type="button" class="btn close-modal">Отмена</button>
+        </form>
+    </div>
+</div>

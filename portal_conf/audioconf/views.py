@@ -1,10 +1,12 @@
+import datetime as dt 
 
 from django.shortcuts import render, redirect
-from django.views.generic.edit import CreateView
+from django.views.generic import CreateView, ListView, DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from django.urls import reverse_lazy
 from django.utils.dateparse import parse_datetime
 
 from .models import BookingAcs, AcsPhone
@@ -18,7 +20,7 @@ def booking_calendar_view(request):
     events = []
     for booking in bookings:
         events.append({
-            'title': f'{booking.acs_phone.phone} - {booking.owner.username}',
+            'title': f'{booking.acs_phone.phone} - {booking.responsible}',
             'start': booking.start_conf.isoformat(),
             'end': booking.end_conf.isoformat(),
             'owner': booking.owner.username,
@@ -35,36 +37,37 @@ def booking_calendar_view(request):
 class BookingCreateView(LoginRequiredMixin, CreateView):
     model = BookingAcs
     form_class = BookingForm
-    template_name = 'booking_form.html'  # Форма для отображения
+    template_name = 'booking_form.html'
+    success_url = reverse_lazy('index')
 
     def form_valid(self, form):
-        # Устанавливаем владельца как текущего пользователя
         form.instance.owner = self.request.user
         return super().form_valid(form)
 
     def get_success_url(self):
         return redirect('calendar-view')
 
+
 @login_required
 @csrf_exempt
 def create_booking(request):
     if request.method == 'POST':
-        acs_phone_id = request.POST.get('acs_phone')
-        start_conf = parse_datetime(request.POST.get('start_conf'))
-        end_conf = parse_datetime(request.POST.get('end_conf'))
-
-        # Валидация и создание бронирования
-        if start_conf and end_conf:
-            booking = BookingAcs.objects.create(
-                acs_phone_id=acs_phone_id,
-                start_conf=start_conf,
-                end_conf=end_conf,
-                owner=request.user
-            )
-            return JsonResponse({'status': 'success', 'booking_id': booking.id})
+        form = BookingForm(request.POST)
+        if form.is_valid():
+            booking = form.save(commit=False)
+            booking.owner = request.user
+            booking.save()
+            acs_phone = AcsPhone.objects.get(id=request.POST.get('acs_phone'))
+            return JsonResponse({'status': 'success',
+                                 'message': 'Бронирование успешно создано',
+                                 'acs_phone': str(acs_phone.phone),
+                                 'pin_code': str(acs_phone.password)})
         else:
-            return JsonResponse({'status': 'error', 'message': 'Invalid data'}, status=400)
-    return JsonResponse({'status': 'error', 'message': 'Only POST requests are allowed'}, status=405)
+            return JsonResponse({'status': 'error', 'error': form.errors},
+                                status=400)
+    return JsonResponse({'status': 'error',
+                         'message': 'Only POST requests are allowed'},
+                        status=405)
 
 
 def get_bookings(request):
@@ -77,3 +80,28 @@ def get_bookings(request):
             'end': booking.end_conf.isoformat(),
         })
     return JsonResponse(events, safe=False)
+
+
+class AcsPhoneListView(ListView):
+    model = AcsPhone
+    queryset = AcsPhone.objects.with_related_data()
+    ordering = 'phone'
+    template_name = 'conference/acs_phone_list.html'
+    paginate_by = 10
+
+
+class AcsPhoneDetail(DetailView):
+    model = AcsPhone
+    template_name = 'conference/acs_phone_detail.html'
+    context_object_name = 'acs_phone'
+    queryset = AcsPhone.objects.with_related_data()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['bookings'] = (
+            self.object.bookings.all().filter(start_conf__gte=dt.datetime.now())
+        )
+        context['employees'] = (
+            self.object.department.employees.all()
+        )
+        return context
