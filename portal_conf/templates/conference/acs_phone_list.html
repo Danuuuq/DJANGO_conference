@@ -3,6 +3,7 @@
   Номера конференций
 {% endblock %}
 {% block content %}
+  {% include "includes/paginator.html" %}
   {% for acs_phone in page_obj %}
     <article class="mb-5">
       {% include "includes/acs_phone_card.html" %}

@@ -12,7 +12,8 @@
     <title>
       {% block title %}{% endblock %}
     </title>
-    {% bootstrap_css %}
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    {% comment %} {% bootstrap_css %} {% endcomment %}
   </head>
   <body>
     {% include "includes/header.html" %}

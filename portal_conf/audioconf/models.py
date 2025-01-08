@@ -137,4 +137,4 @@ class BookingAcs(models.Model):
                     'Бронирование пересекается с уже существующими.')
 
     def __str__(self):
-        return f'Бронь {self.owner} номера {self.acs_phone} id {self.id}'
+        return f'Бронь {self.responsible} номера {self.acs_phone} id {self.id}'

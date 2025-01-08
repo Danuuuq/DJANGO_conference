@@ -87,7 +87,7 @@ class AcsPhoneListView(ListView):
     queryset = AcsPhone.objects.with_related_data()
     ordering = 'phone'
     template_name = 'conference/acs_phone_list.html'
-    paginate_by = 10
+    paginate_by = 50
 
 
 class AcsPhoneDetail(DetailView):
