@@ -9,6 +9,21 @@
         document.getElementById('bookingModal').style.display = 'none';  // Закрываем модальное окно
     });
     
+    // Функция для копирования текста в буфер обмена (fallback для HTTP)
+    function copyTextFallback(text) {
+        var textArea = document.createElement("textarea");
+        textArea.value = text;
+        document.body.appendChild(textArea);
+        textArea.select();
+        try {
+            document.execCommand('copy');
+            alert('Данные бронирования скопированы!');
+        } catch (err) {
+            alert('Не удалось скопировать данные.');
+        }
+        document.body.removeChild(textArea);
+    }
+    
     // Обработчик отправки формы бронирования
     document.getElementById('bookingForm').addEventListener('submit', function(event) {
         event.preventDefault(); // Отключаем стандартное поведение формы
@@ -41,12 +56,23 @@
                                    Городской номер: 8(812)613-30-${acsPhone.slice(-2)}
                                    Пин-код: ${pinCode}`.replace(/^\s+/gm, '');
 
-                // Копирование текста в буфер обмена
-                navigator.clipboard.writeText(bookingInfo).then(function() {
-                    alert('Данные бронирования скопированы в буфер обмена!');
-                }).catch(function(err) {
-                    alert('Не удалось скопировать данные в буфер обмена: ' + err);
-                });
+                // Попытка копирования текста в буфер обмена (При HTTP)
+                try {
+                    navigator.clipboard.writeText(bookingInfo).then(function() {
+                        alert('Данные бронирования скопированы в буфер обмена!');
+                    }).catch(function() {
+                        copyTextFallback(bookingInfo); // Если не удалось скопировать через Clipboard API
+                    });
+                } catch (e) {
+                    copyTextFallback(bookingInfo); // Используем fallback метод в случае ошибки
+                }
+
+                // Копирование текста в буфер обмена (Работает только при HTTPS)
+                //navigator.clipboard.writeText(bookingInfo).then(function() {
+                //    alert('Данные бронирования скопированы в буфер обмена!');
+                //}).catch(function(err) {
+                //    alert('Не удалось скопировать данные в буфер обмена: ' + err);
+                //});
         
                 // Обновление событий на календаре Не работает надо разобраться с глобальной переменной calendar
                 // calendar.render();
