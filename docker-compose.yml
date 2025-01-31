@@ -2,6 +2,7 @@ volumes:
   pg_data:
   static:
   media:
+  acs_info:
 
 services:
   db:
@@ -15,6 +16,7 @@ services:
     volumes:
       - static:/static
       - media:/media
+      - acs_info:/data
     depends_on:
       - db
   gateway:

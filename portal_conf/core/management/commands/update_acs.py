@@ -21,14 +21,9 @@ class Command(BaseCommand):
             reader = csv.reader(file, delimiter=';')
             for row in reader:
                 acs_id = row[0]
-                phone = row[1]
-                password = row[2]
-                department = Department.objects.get(id=row[3])
+                password = row[1]
                 obj, created = model.objects.update_or_create(
                     acs_id=acs_id,
-                    defaults={'phone': phone,
-                              'password': password,
-                              'department': department}
-                )
+                    defaults={'password': password})
         self.stdout.write(self.style.SUCCESS('Успешное обновление '
                                              f'данных из {file_path}'))
