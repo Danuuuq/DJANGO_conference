@@ -1,5 +1,6 @@
 import datetime as dt 
 
+from django.db.models import Q
 from django.shortcuts import render, redirect
 from django.views.generic import CreateView, ListView, DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -88,6 +89,17 @@ class AcsPhoneListView(ListView):
     ordering = 'phone'
     template_name = 'conference/acs_phone_list.html'
     paginate_by = 50
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        search_query = self.request.GET.get('search', '')
+        if search_query:
+            queryset = queryset.filter(
+                Q(phone__icontains=search_query) |
+                Q(department__employees__last_name__icontains=search_query) |
+                Q(department__name__icontains=search_query)
+            )
+        return queryset
 
 
 class AcsPhoneDetail(DetailView):

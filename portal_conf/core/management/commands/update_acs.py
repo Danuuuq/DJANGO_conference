@@ -13,7 +13,7 @@ class Command(BaseCommand):
 
         data_dir = settings.BASE_DIR / 'data'
 
-        self.import_data(data_dir / 'acs_phone.csv',
+        self.import_data(data_dir / 'acs_phone_update.csv',
                          AcsPhone)
 
     def import_data(self, file_path, model):

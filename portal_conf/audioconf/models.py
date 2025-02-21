@@ -99,6 +99,8 @@ class BookingAcs(models.Model):
                                    max_length=50, null=True, blank=True)
     owner = models.ForeignKey(User, verbose_name='Владелец бронирования',
                               on_delete=models.CASCADE)
+    record = models.BooleanField(verbose_name='Предоставить запись',
+                                 default=False)
 
     objects = BookingQuerySet.as_manager()
 

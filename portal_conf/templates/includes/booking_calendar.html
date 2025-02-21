@@ -80,8 +80,11 @@
 
             // Инициализация календаря FullCalendar
             var calendar = new FullCalendar.Calendar(calendarEl, {
-                initialView: 'dayGridMonth', // Вид по умолчанию (месяц)
+                initialView: 'timeGridWeek', // Вид по умолчанию (неделя)
                 firstDay: 1, // Начало недели с понедельника
+                weekends: false,
+                slotMinTime: '08:00:00',     // Минимальное время для отображения
+                slotMaxTime: '18:00:00', 
                 locale: 'ru', // Локализация
                 headerToolbar: {
                     left: 'prev,next today',

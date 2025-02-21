@@ -11,7 +11,7 @@ sudo docker compose exec backend python manage.py import_acs # Загрузка 
 sudo docker compose exec backend python manage.py import_employees # Загрузка сотрудников
 2.1 Обновление данных по АКС номерам (временная схема):
 выгрузить файл acs_phone.csv с АКС сервера из директории: /home/protei/backup_json
-добавить файл acs_phone.csv в portal_project/PET_PROJECT_conference/portal_conf/data
+добавить файл acs_phone.csv в portal_project/PET_PROJECT_conference/portal_conf/data под именем acs_phone_update.csv
 формат данных id АКС с сервера, новый ПИН:
 11;9804
 12;3666
