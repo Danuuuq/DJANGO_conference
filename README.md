@@ -1,4 +1,3 @@
-```markdown
 # PET_PROJECT_conference
 
 Проект представляет собой портал для управления конференциями с использованием АКС (автоматизированной конференц-связи). В проекте используются Docker-контейнеры для запуска базы данных, бэкенда и Nginx для просмотра логов.
@@ -16,7 +15,7 @@ sudo docker compose up --build
 Если вы хотите пересобрать только бэкенд и шлюз (без пересоздания контейнера с БД, чтобы сохранить данные), выполните:
 
 ```bash
-docker-compose up --build backend gateway
+sudo docker-compose up --build backend gateway
 ```
 
 #### 1.2 Запуск в фоновом режиме
@@ -64,7 +63,7 @@ sudo docker compose up -d
    ```
 4. Запустите сервер с пересборкой:
    ```bash
-   sudo docker compose up -d --build
+   sudo docker compose up -d --build backend
    ```
 5. Обновите ПИН-коды в базе данных:
    ```bash

@@ -14,6 +14,7 @@ from .models import BookingAcs, AcsPhone
 from .forms import BookingForm
 
 
+@login_required
 def booking_calendar_view(request):
     bookings = BookingAcs.objects.with_related_data()
     acs_phones = AcsPhone.objects.all()
@@ -71,6 +72,7 @@ def create_booking(request):
                         status=405)
 
 
+@login_required
 def get_bookings(request):
     bookings = BookingAcs.objects.all()
     events = []
@@ -83,7 +85,7 @@ def get_bookings(request):
     return JsonResponse(events, safe=False)
 
 
-class AcsPhoneListView(ListView):
+class AcsPhoneListView(LoginRequiredMixin, ListView):
     model = AcsPhone
     queryset = AcsPhone.objects.with_related_data()
     ordering = 'phone'
@@ -102,7 +104,7 @@ class AcsPhoneListView(ListView):
         return queryset
 
 
-class AcsPhoneDetail(DetailView):
+class AcsPhoneDetail(LoginRequiredMixin, DetailView):
     model = AcsPhone
     template_name = 'conference/acs_phone_detail.html'
     context_object_name = 'acs_phone'

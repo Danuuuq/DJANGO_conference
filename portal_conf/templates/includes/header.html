@@ -4,32 +4,28 @@
     <div class="container">
       <a class="navbar-brand" href="{% url 'audioconf:index' %}">
         <img src="{% static 'img/logo.png' %}" width="30" height="30" class="d-inline-block align-top" alt="">
-        Портал конференций
+        Календарь конференций
       </a>
       {% with request.resolver_match.view_name as view_name %}
-        <ul class="nav  nav-pills">
-          <li class="nav-item">
-            <a class="nav-link {% if view_name == 'audioconf:phones_list' %} text-white {% endif %}" href="{% url 'audioconf:phones_list' %}">
-              Номера конференции
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link {% if view_name == 'audioconf:index' %} text-white {% endif %}" href="{% url 'audioconf:index' %}">
-              Календарь бронирования конференций
-            </a>
-          </li>
           {% if user.is_authenticated %}
+          <!-- Центрируем форму поиска -->
+          <form method="GET" action="{% url 'audioconf:phones_list' %}" class="d-flex ml-auto w-50">
+              <div class="input-group">
+                <input type="text" id="search" name="search" class="form-control" value="{{ request.GET.search }}" placeholder="Поиск номера конференции (подразделение, фамилия, номер, id)">
+                <button type="submit" class="btn btn-primary">Искать</button>
+            </form>
+          </div>
+          <ul class="nav  nav-pills">
+            <li class="nav-item">
+              <a class="nav-link {% if view_name == 'audioconf:phones_list' %} text-white {% endif %}" href="{% url 'audioconf:phones_list' %}">
+                Номера конференции
+              </a>
+            </li>
             <div class="btn-group" role="group" aria-label="Basic outlined example">
               <button type="button" class="btn btn-outline-primary"><a class="text-decoration-none text-reset"
                   href="{% url 'logout' %}">Выйти</a></button>
             </div>
           {% else %}
-            <div class="btn-group" role="group" aria-label="Basic outlined example">
-              <button type="button" class="btn btn-outline-primary"><a class="text-decoration-none text-reset"
-                  href="{% url 'login' %}">Войти</a></button>
-              <button type="button" class="btn btn-outline-primary"><a class="text-decoration-none text-reset"
-                  href="{% url 'registration' %}">Регистрация</a></button>
-            </div>
           {% endif %}
         </ul>
       {% endwith %}

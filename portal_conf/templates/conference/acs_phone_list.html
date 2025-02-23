@@ -3,11 +3,6 @@
   Номера конференций
 {% endblock %}
 {% block content %}
-  <form method="GET" action="{% url 'audioconf:phones_list' %}">
-    <label for="search">Поиск:</label>
-    <input type="text" id="search" name="search" value="{{ request.GET.search }}">
-    <button type="submit">Искать</button>
-  </form>
   {% include "includes/paginator.html" %}
   {% for acs_phone in page_obj %}
     <article class="mb-5">
