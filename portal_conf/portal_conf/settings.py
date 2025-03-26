@@ -5,9 +5,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv('SECRET_KEY', "django-insecure-1%0ijebvwpuf#8(lq5govyr10+&st2zgo904csyj7r64$btd_2")
 
-DEBUG = os.getenv('DEBUG', 'True') == 'True'
+DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['portal-conf']
+
+CSRF_TRUSTED_ORIGINS = ['https://portal-conf']
 
 INSTALLED_APPS = [
     "django.contrib.admin",

@@ -2,6 +2,25 @@
 
 Проект представляет собой портал для управления конференциями с использованием АКС (автоматизированной конференц-связи). В проекте используются Docker-контейнеры для запуска базы данных, бэкенда и Nginx для просмотра логов.
 
+## Как работает автозапуск:  
+ - проверка работы nginx и его запуск:  
+```bash
+sudo systemctl status nginx 
+```  
+```bash
+sudo systemctl start nginx
+```  
+ - проверка работы портала и его запуск/перезапуск:  
+```bash
+sudo systemctl status portal-conf  
+```  
+```bash
+sudo systemctl start portal-conf  
+```  
+```bash
+sudo systemctl restart portal-conf  
+```  
+
 ## Порядок запуска проекта
 
 ### 1. Сборка и запуск контейнеров
@@ -15,7 +34,7 @@ sudo docker compose up --build
 Если вы хотите пересобрать только бэкенд и шлюз (без пересоздания контейнера с БД, чтобы сохранить данные), выполните:
 
 ```bash
-sudo docker-compose up --build backend gateway
+sudo docker compose up --build backend gateway
 ```
 
 #### 1.2 Запуск в фоновом режиме
