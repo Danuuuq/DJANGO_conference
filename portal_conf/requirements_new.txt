@@ -1,0 +1,15 @@
+asgiref==3.8.1
+Django==5.1.4
+django-bootstrap5==24.3
+django-filter==25.1
+django-widget-tweaks==1.5.0
+ldap3==2.9.1
+pillow==11.0.0
+psycopg2-binary==2.9.3
+pyasn1==0.6.1
+PyYAML==6.0.2
+social-auth-app-django=5.4.3
+sqlparse==0.5.2
+typing_extensions==4.12.2
+tzdata==2024.2
+webcolors==24.11.1

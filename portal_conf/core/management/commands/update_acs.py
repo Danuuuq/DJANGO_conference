@@ -22,8 +22,9 @@ class Command(BaseCommand):
             for row in reader:
                 acs_id = row[0]
                 password = row[1]
-                obj, created = model.objects.update_or_create(
-                    acs_id=acs_id,
-                    defaults={'password': password})
+                model.objects.filter(acs_id=acs_id).update(password=password)
+                # obj, created = model.objects.update_or_create(
+                #     acs_id=acs_id,
+                #     defaults={'password': password})
         self.stdout.write(self.style.SUCCESS('Успешное обновление '
                                              f'данных из {file_path}'))
